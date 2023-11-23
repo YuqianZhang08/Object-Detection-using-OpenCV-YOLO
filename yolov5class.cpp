@@ -1,7 +1,7 @@
 // Include Libraries.
 #include <opencv2/opencv.hpp>
 #include <fstream>
-#include yolov5class.h
+#include "yolov5class.h"
 
 // Namespaces.
 using namespace cv;
