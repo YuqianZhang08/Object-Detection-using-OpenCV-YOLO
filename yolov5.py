@@ -1,5 +1,8 @@
+'''python yolov5.py --labelpath coco.names --imgpath sample.jpg --modelpath models/yolov5m.onnx'''
+
 import cv2
 import numpy as np
+import argparse
 
 # Constants.
 INPUT_WIDTH = 640
@@ -27,7 +30,7 @@ def draw_label(input_image, label, left, top):
     text_size = cv2.getTextSize(label, FONT_FACE, FONT_SCALE, THICKNESS)
     dim, baseline = text_size[0], text_size[1]
     # Use text size to create a BLACK rectangle. 
-    cv2.rectangle(input_image, (left, top), (left + dim[0], top + dim[1] + baseline), BLACK, cv2.FILLED);
+    cv2.rectangle(input_image, (left, top), (left + dim[0], top + dim[1] + baseline), BLACK, cv2.FILLED)
     # Display text inside the rectangle.
     cv2.putText(input_image, label, (left, top + dim[1]), FONT_FACE, FONT_SCALE, YELLOW, THICKNESS, cv2.LINE_AA)
 
@@ -101,22 +104,33 @@ def post_process(input_image, outputs):
 		cv2.rectangle(input_image, (left, top), (left + width, top + height), BLUE, 3*THICKNESS)
 		label = "{}:{:.2f}".format(classes[class_ids[i]], confidences[i])
 		draw_label(input_image, label, left, top)
-
 	return input_image
 
 
 if __name__ == '__main__':
 	# Load class names.
-	classesFile = "coco.names"
+ 
+	parser = argparse.ArgumentParser(description='object detection')
+	parser.add_argument('--labelpath', type=str, default='coco.names',
+                    help='labels')
+	parser.add_argument('--imgpath', type=str, default='sample1.jpg',
+                    help='imagepath for test')
+	parser.add_argument('--modelpath', type=str, default='models/yolov5s.onnx')
+	args = parser.parse_args()
+ 
+	classesFile = args.labelpath
 	classes = None
+ 
 	with open(classesFile, 'rt') as f:
 		classes = f.read().rstrip('\n').split('\n')
 
 	# Load image.
-	frame = cv2.imread('sample.jpg')
+	#frame = cv2.imread('sample.jpg')
+	frame = cv2.imread(args.imgpath)
 
 	# Give the weight files to the model and load the network using them.
-	modelWeights = "models/yolov5s.onnx"
+	#modelWeights = "models/yolov5s.onnx"
+	modelWeights = args.modelpath
 	net = cv2.dnn.readNet(modelWeights)
 
 	# Process image.
