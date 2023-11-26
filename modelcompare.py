@@ -4,7 +4,7 @@ import numpy as np
 import argparse
 import cv2
 import argparse
-from load_annotation import load_annotations_gt, load_annotations_dt
+from src.load_annotation import load_annotations_gt, load_annotations_dt
 from src.evaluators.coco_evaluator import get_coco_summary
 
 

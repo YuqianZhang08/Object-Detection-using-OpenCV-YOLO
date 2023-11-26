@@ -23,7 +23,7 @@ import src.utils.converter as converter
 import src.utils.general_utils as general_utils
 from src.utils.enumerators import BBFormat, BBType, CoordinatesType
 from src.evaluators.coco_evaluator import get_coco_summary
-from load_annotation import load_annotations_dt, load_annotations_gt
+from src.load_annotation import load_annotations_dt, load_annotations_gt
 from modelcompare import modelperformance
 
 #define single output structure type
