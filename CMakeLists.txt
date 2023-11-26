@@ -7,9 +7,19 @@ SET(OpenCV_DIR "E:/opencv/opencv/build/x64/vc16/lib")
 
 find_package(OpenCV REQUIRED)
 
-add_library(yourlib SHARED yolov5.cpp)
-#add_executable(main yolov5class.cpp)
+
+set(SOURCE_FILES
+    yolov5.cpp
+    yolov5class.h
+)
+
+#add_library(YOLO SHARED ${SOURCE_FILES})
+#add_library(YOLOV5 SHARED SHARED ${SOURCE_FILES})
+add_executable(main ${SOURCE_FILES})
 
 include_directories(${OpenCV_INCLUDE_DIRS})
-target_link_libraries(yourlib ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT})
-#target_link_libraries(main ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+
+#target_link_libraries(YOLO ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(main ${OpenCV_LIBS} ${CMAKE_THREAD_LIBS_INIT})
+
+

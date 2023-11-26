@@ -1,11 +1,14 @@
 // Include Libraries.
 #include <opencv2/opencv.hpp>
 #include <fstream>
-
+#include <iostream>
+#include <filesystem>
+//#include "yolov5.h"
 // Namespaces.
 using namespace cv;
 using namespace std;
 using namespace cv::dnn;
+namespace fs = filesystem;
 
 // Constants.
 const float INPUT_WIDTH = 640.0;
@@ -25,7 +28,14 @@ Scalar BLUE = Scalar(255, 178, 50);
 Scalar YELLOW = Scalar(0, 255, 255);
 Scalar RED = Scalar(0,0,255);
 
-
+struct ReturnValue {
+    int left;
+    int top;
+    int height;
+    int width;
+    int confidence;
+    Mat img;
+};
 // Draw the predicted bounding box.
 void draw_label(Mat& input_image, string label, int left, int top)
 {
@@ -60,12 +70,13 @@ vector<Mat> pre_process(Mat &input_image, Net &net)
 }
 
 
-Mat post_process(Mat &input_image, vector<Mat> &outputs, const vector<string> &class_name) 
+ReturnValue post_process(Mat &input_image, vector<Mat> &outputs, const vector<string> &class_name) 
 {
     // Initialize vectors to hold respective outputs while unwrapping detections.
     vector<int> class_ids;
     vector<float> confidences;
     vector<Rect> boxes; 
+    ReturnValue result;
 
     // Resizing factor.
     float x_factor = input_image.cols / INPUT_WIDTH;
@@ -125,22 +136,60 @@ Mat post_process(Mat &input_image, vector<Mat> &outputs, const vector<string> &c
         int idx = indices[i];
         Rect box = boxes[idx];
 
-        int left = box.x;
-        int top = box.y;
-        int width = box.width;
-        int height = box.height;
+        result.left = box.x;
+        result.top = box.y;
+        result.width = box.width;
+        result.height = box.height;
         // Draw bounding box.
-        rectangle(input_image, Point(left, top), Point(left + width, top + height), BLUE, 3*THICKNESS);
+        rectangle(input_image, Point(result.left, result.top), Point(result.left + result.width, result.top + result.height), BLUE, 3*THICKNESS);
 
         // Get the label for the class name and its confidence.
         string label = format("%.2f", confidences[idx]);
         label = class_name[class_ids[idx]] + ":" + label;
+        result.confidence = confidences[idx];
         // Draw class labels.
-        draw_label(input_image, label, left, top);
+        draw_label(input_image, label, result.left, result.top);
     }
-    return input_image;
+    result.img=input_image;
+
+    return result;
 }
 
+void performfolder(string folderPath)
+{
+    Mat frame;
+    Net net;
+    net = readNet("models/yolov5s.onnx"); 
+    vector<string> prftimelist;
+    vector<ReturnValue> folderResult;
+
+    try {
+        for (const auto& entry : fs::directory_iterator(folderPath)) {
+            if (entry.is_regular_file() && entry.path().extension() == ".jpg") {
+                std::cout << "Found JPEG file: " << entry.path() << std::endl;
+                ofstream outputFile(entry.path());
+                frame = imread(entry.path());
+                vector<Mat> detections;
+                detections = pre_process(frame, net);
+                ReturnValue imgresult = post_process(frame.clone(), detections, class_list);
+                vector<double> layersTimes;
+                double freq = getTickFrequency() / 1000;
+                double t = net.getPerfProfile(layersTimes) / freq;
+                prftimelist.push_back(t);
+                folderResult.push_back(imgresult);
+                outputFile << imgresult.left << endl;
+                outputFile << imgresult.top << endl;
+                outputFile << imgresult.height << endl;
+                outputFile << imgresult.width << endl;
+                outputFile << imgresult.confidence << endl;
+                outputFile.close();
+            }
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Error accessing directory: " << e.what() << std::endl;
+    }
+
+}
 
 int main()
 {
@@ -165,7 +214,7 @@ int main()
     vector<Mat> detections;
     detections = pre_process(frame, net);
 
-    Mat img = post_process(frame.clone(), detections, class_list);
+    ReturnValue img = post_process(frame.clone(), detections, class_list);
 
     // Put efficiency information.
     // The function getPerfProfile returns the overall time for inference(t) and the timings for each of the layers(in layersTimes)
@@ -174,9 +223,9 @@ int main()
     double freq = getTickFrequency() / 1000;
     double t = net.getPerfProfile(layersTimes) / freq;
     string label = format("Inference time : %.2f ms", t);
-    putText(img, label, Point(20, 40), FONT_FACE, FONT_SCALE, RED);
+    putText(img.img, label, Point(20, 40), FONT_FACE, FONT_SCALE, RED);
 
-    imshow("Output", img);
+    imshow("Output", img.img);
     waitKey(0);
 
     return 0;
