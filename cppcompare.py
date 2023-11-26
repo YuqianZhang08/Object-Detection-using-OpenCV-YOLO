@@ -66,29 +66,29 @@ if __name__ == '__main__':
     # Get user input from the command line for the following parameters
     parser = argparse.ArgumentParser(description='object detection')
     #parser.add_argument('--disable_cuda', default=False, action='store_true', help='Disable CUDA')
-    parser.add_argument('--labelpath', type=str, default='coco.names',help='labels')
+    parser.add_argument('--labelpath', type=str, default='E:/medtronic/git/open/coco.names',help='labels')
     parser.add_argument('--imgpath', type=str, default='sample.jpg', help='imagepath for test')       
     parser.add_argument('--modelpath', type=str, default='models/yolov5s.onnx')
     parser.add_argument('--displayoutput', type=bool, default=False)
-    parser.add_argument('--imgfolder', type=str, default='test/val2017',help='image foler path')
-    parser.add_argument('--dir_annotations_gt', type=str,default='test/labels/', help='directory of ground truth, yolo type')
-    parser.add_argument('--dir_dets', type=str, default='test/cppdetection')
+    parser.add_argument('--imgfolder', type=str, default='E:/medtronic/Project2/test/val2017',help='image foler path')
+    parser.add_argument('--dir_annotations_gt', type=str,default='E:/medtronic/Project2/test/labels', help='directory of ground truth, yolo type')
+    parser.add_argument('--dir_dets', type=str, default='E:/medtronic/Project2/test')
     
     args = parser.parse_args()
     
-    args.modelpath='models/yolo5s.onnx' #define the model to use
+    args.modelpath='E:/medtronic/git/open/model/yolov5s.onnx' #define the model to use
     
     #Load dll to python
     kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
-    lib=kernel32.LoadLibraryW('E:/medtronic/medtronic/Project2/x64/Release/Project2.dll')
-    os.chdir('E:/medtronic/medtronic/Project2/x64/Release')
-    lib=ctypes.CDLL('Project2.dll')
+    lib=kernel32.LoadLibraryW('E:/medtronic/git/open/lib/YOLO.dll')
+    os.chdir('E:/medtronic/git/open/lib')
+    lib=ctypes.CDLL('YOLO.dll')
     
     #define cpp input directory
-    class_path = ctypes.c_char_p(args.labelpath)
-    model_path = ctypes.c_char_p(args.modelpath)
-    resultPath = ctypes.c_char_p(args.dir_dets)
-    folderpath=ctypes.c_char_p(args.imgfolder)
+    class_path = ctypes.c_char_p(args.labelpath.encode('utf-8'))
+    model_path = ctypes.c_char_p(args.modelpath.encode('utf-8'))
+    resultPath = ctypes.c_char_p(args.dir_dets.encode('utf-8'))
+    folderpath = ctypes.c_char_p(args.imgfolder.encode('utf-8'))
     
     '''for single image processing using dll
     return is as defined in ResultOutput'''
@@ -96,16 +96,16 @@ if __name__ == '__main__':
     #result=yolo.YOLOSingledetect(img_path,imgshow=True)  
     
     #obtain cpp results runing on a folder of images, with yoyo format results saved in folder
-    cppdetect(model_path, class_path, folderpath,resultPath)  
+    #cppdetect(model_path, class_path, folderpath,resultPath)  
     
     #convert yoyo format to coco format for both detection results and ground truth
-    cppdet_annotations = load_annotations_dt(args.dir_dets,args.imgfolder,args.labelpath)
-    gt_annotations =load_annotations_gt(args.dir_annotations_gt,args.imgfolder,args.labelpath)  
+    #cppdet_annotations = load_annotations_dt(args.dir_dets,args.imgfolder,args.labelpath)
+    #gt_annotations =load_annotations_gt(args.dir_annotations_gt,args.imgfolder,args.labelpath)  
     
-    cpp_res = {}
+    #cpp_res = {}
     #get evaluation results of model performance and return 
     cpp_res = get_coco_summary(gt_annotations, cppdet_annotations)
-    with open('cpp5s_res.txt', 'w') as txtfile:
+    with open('E:/medtronic/git/open/cpp5s_res.txt', 'w') as txtfile:
         for key, value in cpp_res.items():
             txtfile.write(f"{key}: {value}\n")
             

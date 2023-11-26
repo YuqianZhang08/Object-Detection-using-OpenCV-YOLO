@@ -3,14 +3,16 @@ set(CMAKE_BUILD_TYPE "")
 
 project(yolov5 VERSION 0.1.0)
 
-SET(OpenCV_DIR "E:/opencv/opencv/build/x64/vc16/lib")
+SET(OpenCV_DIR "C:/OpenCV/opencv/build/x64/vc16/lib")
 
 find_package(OpenCV REQUIRED)
 
 
 set(SOURCE_FILES
-    yolov5.cpp
+    yolov5class.cpp
     yolov5class.h
+    batchprocess.cpp
+    batchprocess.h
 )
 
 #add_library(YOLO SHARED ${SOURCE_FILES})
