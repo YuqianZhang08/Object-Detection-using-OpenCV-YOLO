@@ -78,7 +78,7 @@ if __name__ == '__main__':
     
     args.modelpath='E:/medtronic/git/open/model/yolov5s.onnx' #define the model to use
     
-    #Load dll to python
+    #Load dll to python. use exact full path
     kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
     lib=kernel32.LoadLibraryW('E:/medtronic/git/open/lib/YOLO.dll')
     os.chdir('E:/medtronic/git/open/lib')
@@ -96,20 +96,22 @@ if __name__ == '__main__':
     #result=yolo.YOLOSingledetect(img_path,imgshow=True)  
     
     #obtain cpp results runing on a folder of images, with yoyo format results saved in folder
-    #cppdetect(model_path, class_path, folderpath,resultPath)  
+    cppdetect(model_path, class_path, folderpath,resultPath)  
     
     #convert yoyo format to coco format for both detection results and ground truth
-    #cppdet_annotations = load_annotations_dt(args.dir_dets,args.imgfolder,args.labelpath)
-    #gt_annotations =load_annotations_gt(args.dir_annotations_gt,args.imgfolder,args.labelpath)  
+    cppdet_annotations = load_annotations_dt(args.dir_dets,args.imgfolder,args.labelpath)
+    gt_annotations =load_annotations_gt(args.dir_annotations_gt,args.imgfolder,args.labelpath)  
     
-    #cpp_res = {}
-    #get evaluation results of model performance and return 
+    #obtain model evaluation results and write to file
+    cpp_res = {}
+    get evaluation results of model performance and return 
     cpp_res = get_coco_summary(gt_annotations, cppdet_annotations)
     with open('E:/medtronic/git/open/cpp5s_res.txt', 'w') as txtfile:
         for key, value in cpp_res.items():
             txtfile.write(f"{key}: {value}\n")
-            
+
+    #obtain python implementation evaluation results and write to file        
     python_met = modelperformance(args)
-    with open('yolov5sresults.txt', 'w') as txtfile:
+    with open('E:/medtronic/git/open/py5s_res.txt', 'w') as txtfile:
         for key, value in python_met.items():
             txtfile.write(f"{key}: {value}\n")

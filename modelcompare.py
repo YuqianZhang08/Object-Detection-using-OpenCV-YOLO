@@ -34,10 +34,10 @@ def runmodelonfolder(args):
     inferenceTime=[]  
     
     #perform object detection to the images in the folder
-    for filename in os.listdir(args.imgdir)[:20]:
+    for filename in os.listdir(args.imgfolder)[:20]:
         imgid=filename.split('.jpg')[0]   
         
-        frame = cv2.imread(args.imgdir+'/'+filename)  
+        frame = cv2.imread(args.imgfolder+'/'+filename)  
         yolonet.detect(frame)     #perform detection to the current image 
         writetofile(yolonet.dtresults,savedir,imgid)    #save results to a txt file as yolo format
         
@@ -56,14 +56,14 @@ def modelperformance(args):
     inferenceTime=runmodelonfolder(args)
     
     #get detection results of all images in coco format
-    det_annotations = load_annotations_dt(args.dir_dets,args.imgdir,args.labelpath)
+    det_annotations = load_annotations_dt(args.dir_dets,args.imgfolder,args.labelpath)
     if det_annotations is None or len(det_annotations) == 0:
         print(
                 'No detection of the selected type was found in the folder.\nCheck if the selected type corresponds to the files in the folder and try again.',
                 'Invalid detections')
         
     #get ground truth in coco format
-    gt_annotations =load_annotations_gt(args.dir_annotations_gt,args.imgdir,args.labelpath)      
+    gt_annotations =load_annotations_gt(args.dir_annotations_gt,args.imgfolder,args.labelpath)      
     if gt_annotations is None or len(gt_annotations) == 0:
         print(
                 'No ground-truth bounding box of the selected type was found in the folder.\nCheck if the selected type corresponds to the files in the folder and try again.',
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     parser.add_argument('--imgpath', type=str, default='sample.jpg', help='imagepath for test')       
     parser.add_argument('--modelpath', type=str, default='models/yolov5s.onnx')
     parser.add_argument('--displayoutput', type=bool, default=False)
-    parser.add_argument('--imgdir', type=str, default='test/val2017',help='image foler path')
+    parser.add_argument('--imgfolder', type=str, default='test/val2017',help='image foler path')
     parser.add_argument('--dir_annotations_gt', type=str,default='test/labels/', help='directory of ground truth, yolo type')
     parser.add_argument('--dir_dets', type=str, default='test/detection/')
     
