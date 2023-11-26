@@ -24,7 +24,7 @@ void writeResultsToFile(ResultOutput &output, const string &filename) {
 	outFile.close();
 }
 
-void batchProcess(const string& mdlPath, const string& classPath, const string& folderPath) {
+void batchProcess(const string& mdlPath, const string& classPath, const string& folderPath, const string& savefolder) {
 
 	//create yolomodel and initiate the dnn model with classes
 	YOLO yolomodel(classPath, mdlPath);
@@ -43,12 +43,12 @@ void batchProcess(const string& mdlPath, const string& classPath, const string& 
 				ResultOutput result = yolomodel.detect(entry.path().string(), showimg);
 
 				//write results of each images to individual files and save in detect folder
-				if (!fs::exists(folderPath+"/detect/")) 
+				if (!fs::exists(savefolder))
 				{
-					fs::create_directory(folderPath + "/detect/");
+					fs::create_directory(savefolder);
 				}
 				//save to txt file with name same as the image's
-				string filename = folderPath+"/detect/"+entry.path().filename().string().substr(0, entry.path().filename().string().size()-4) + ".txt";
+				string filename = savefolder+ '/' +entry.path().filename().string().substr(0, entry.path().filename().string().size()-4) + ".txt";
 				writeResultsToFile(result, filename);
 
 				//add current image process time to vector
@@ -61,7 +61,7 @@ void batchProcess(const string& mdlPath, const string& classPath, const string& 
 		cerr << "Error accessing directory: " << e.what() << endl;
 	}
 	//save response time to the results folder
-	ofstream outputFile(folderPath+"/detect/responseTime.txt");
+	ofstream outputFile(savefolder+"/responseTime.txt");
 	if (!outputFile.is_open()) {
 		cerr << "Error opening the file." << endl;
 	}
@@ -109,15 +109,16 @@ void processViaDll(const char* dllPath, const char* modelPath, const char* class
 }
 int main() {
 	
-	string folderPath = "E:/medtronic/val2017"; // Update this with your folder path
+	string folderPath = "E:/medtronic/Project2/test/val2017"; // Update this with your folder path
 
 	string classname = "E:/medtronic/coco.names"; 
 
 	string modelPath = "E:/medtronic/Project2/Project2/yolov5s.onnx";
+	string savepath = "E:/medtronic/Project2/test/cppdetect";
 
 	//YOLO yolomodel(classname, modelPath);
 
-	batchProcess( modelPath, classname, folderPath);  //process the images in a folder
+	batchProcess( modelPath, classname, folderPath, savepath);  //process the images in a folder
 	
 	return 0;
 }
@@ -127,9 +128,9 @@ extern "C" {
 #endif
 	//export batch process function to dll and call with other platforms.
 
-	__declspec(dllexport) void cppbatchProcess(const char* mdlPath, const char* classPath, const char* folderPath)
+	__declspec(dllexport) void cppbatchProcess(const char* mdlPath, const char* classPath, const char* folderPath, const char* savepath)
 	{
-		batchProcess(mdlPath, classPath, folderPath);
+		batchProcess(mdlPath, classPath, folderPath,savepath);
 	}
 
 
