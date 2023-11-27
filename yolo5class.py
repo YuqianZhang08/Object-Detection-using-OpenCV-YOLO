@@ -134,7 +134,7 @@ if __name__ == '__main__':
     #parser.add_argument('--disable_cuda', default=False, action='store_true', help='Disable CUDA')
     parser.add_argument('--labelpath', type=str, default='coco.names',help='labels')
     parser.add_argument('--imgpath', type=str, default='sample.jpg', help='imagepath for test')       
-    parser.add_argument('--modelpath', type=str, default='models/yolov5s.onnx')
+    parser.add_argument('--modelpath', type=str, default='model/yolov5s.onnx')
     parser.add_argument('--displayoutput', type=bool, default=True)
     args = parser.parse_args()
 

@@ -174,19 +174,18 @@ ResultOutput YOLO::detect(const string& imgpath, bool showimg=true)
     return imgOutput;
 }
 
-/*
+
 int main()
 {
 	// Load class list.
 	Mat frame;
-	frame = imread("E:/medtronic/Project2/sample.jpg");
-	imshow("Output", frame);
-	YOLO yolomodel("E:/medtronic/coco.names", "models/yolov5s.onnx");
+
+	YOLO yolomodel("./coco.names", "./models/yolov5s.onnx");
 	ResultOutput output=yolomodel.detect("sample.jpg");
     
 	return 0;
 }
-*/
+
 
 #ifdef __cplusplus
 extern "C" {

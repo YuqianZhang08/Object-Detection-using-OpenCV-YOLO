@@ -16,7 +16,7 @@ set(SOURCE_FILES
 )
 
 #add_library(YOLO SHARED ${SOURCE_FILES})
-#add_library(YOLOV5 SHARED SHARED ${SOURCE_FILES})
+
 add_executable(main ${SOURCE_FILES})
 
 include_directories(${OpenCV_INCLUDE_DIRS})
