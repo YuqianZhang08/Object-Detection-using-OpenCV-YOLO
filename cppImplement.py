@@ -66,14 +66,14 @@ if __name__ == '__main__':
     # Get user input from the command line for the following parameters
     parser = argparse.ArgumentParser(description='object detection')
     #parser.add_argument('--disable_cuda', default=False, action='store_true', help='Disable CUDA')
-    parser.add_argument('--labelpath', type=str, default='E:/medtronic/git/open/coco.names',help='labels')
+    parser.add_argument('--labelpath', type=str, default='./coco.names',help='labels')
     parser.add_argument('--dllpath', type=str, default='E:/medtronic/git/open/lib/YOLO.dll', help='imagepath for test')       
-    parser.add_argument('--modelpath', type=str, default='E:/medtronic/git/open/model/yolov5s.onnx')
+    parser.add_argument('--modelpath', type=str, default='./model/yolov5s.onnx')
     parser.add_argument('--displayoutput', type=bool, default=False)
     parser.add_argument('--imgfolder', type=str, default='E:/medtronic/Project2/test/val2017',help='image foler path')
     parser.add_argument('--dir_annotations_gt', type=str,default='E:/medtronic/Project2/test/labels', help='directory of ground truth, yolo type')
-    parser.add_argument('--dir_dets', type=str, default='E:/medtronic/Project2/test')
-    
+    parser.add_argument('--dir_dets', type=str, default='./detect')
+    parser.add_argument('--pyorcpp', type=str, default='cpp')
     args = parser.parse_args()
     
     #args.modelpath= 'E:/medtronic/git/open/model/yolov5s.onnx'#define the model to use
@@ -96,23 +96,26 @@ if __name__ == '__main__':
     
     return is as defined in ResultOutput'''
     
-    #obtain cpp results runing on a folder of images, with yoyo format results saved in folder
-    cppdetect(model_path, class_path, folderpath,resultPath)  
+    if (args.pyorcpp=="cpp"):
+        #obtain cpp results runing on a folder of images, with yoyo format results saved in folder
+        cppdetect(model_path, class_path, folderpath,resultPath)  
+        cppdet_annotations = load_annotations_dt(args.dir_dets,args.imgfolder,args.labelpath)
     
-    #convert yoyo format to coco format for both detection results and ground truth
-    cppdet_annotations = load_annotations_dt(args.dir_dets,args.imgfolder,args.labelpath)
+    #load ground truth labels
     gt_annotations =load_annotations_gt(args.dir_annotations_gt,args.imgfolder,args.labelpath)  
     
     #obtain model evaluation results and write to file
-    cpp_res = {}
     #get evaluation results of model performance and return 
-    cpp_res = get_coco_summary(gt_annotations, cppdet_annotations)
-    with open('E:/medtronic/git/open/cpp5s_res.txt', 'w') as txtfile:
-        for key, value in cpp_res.items():
-            txtfile.write(f"{key}: {value}\n")
-
-    #obtain python implementation evaluation results and write to file        
-    python_met = modelperformance(args)
-    with open('E:/medtronic/git/open/py5s_res.txt', 'w') as txtfile:
-        for key, value in python_met.items():
-            txtfile.write(f"{key}: {value}\n")
+    if (args.pyorcpp=="cpp"):
+        cpp_res = {}
+        cpp_res = get_coco_summary(gt_annotations, cppdet_annotations)
+        with open('E:/medtronic/git/open/cpp5s_res.txt', 'w') as txtfile:
+            for key, value in cpp_res.items():
+                txtfile.write(f"{key}: {value}\n")
+    
+    if (args.pyorcpp=="py"):
+        #obtain python implementation evaluation results and write to file        
+        python_met = modelperformance(args)
+        with open('E:/medtronic/git/open/py5s_res.txt', 'w') as txtfile:
+            for key, value in python_met.items():
+                txtfile.write(f"{key}: {value}\n")
