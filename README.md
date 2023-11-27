@@ -94,6 +94,6 @@ python cppImplement.py --dllpath "/lib/YOLO.dll" --modelpath "model/yolov5s.onnx
 which generates two .txt files that include the results of cpp implemented model and python implemented model for the task.
 
 ## Other functions
-In batchprocess.cpp file, the method to implement dll in cpp is also indicated. 
+In batchprocess.cpp file, the method to implement dll in cpp is also included.
 
 
