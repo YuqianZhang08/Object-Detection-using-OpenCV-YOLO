@@ -107,6 +107,7 @@ void processViaDll(const char* dllPath, const char* modelPath, const char* class
 
 
 }
+/*
 int main() {
 	
 	string folderPath = "E:/medtronic/Project2/test/val2017"; // Update this with your folder path
@@ -121,7 +122,7 @@ int main() {
 	batchProcess( modelPath, classname, folderPath, savepath);  //process the images in a folder
 	
 	return 0;
-}
+}*/
 
 #ifdef __cplusplus
 extern "C" {
