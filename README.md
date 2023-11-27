@@ -90,7 +90,7 @@ And repeat the cmake process to build dll, which is located in /build/Release
 ### Using Python for dll implementation
 ```Python
 # to implement cpp YOLO model for object detection through dll
-python .\cppImplement.py --dllpath "E:/medtronic/git/open/lib/YOLO.dll" --imgfolder 'E:/medtronic/Project2/test/val2017' --pyorcpp "cpp"
+python .\cppImplement.py --dllpath "./lib/YOLO.dll" --imgfolder './test/val2017' --pyorcpp "cpp"
 
 # to implement python YOLO
 python .\cppImplement.py --dllpath "./lib/YOLO.dll" --imgfolder './test/val2017' --pyorcpp "py"
