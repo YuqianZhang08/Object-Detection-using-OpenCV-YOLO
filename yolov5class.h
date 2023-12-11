@@ -31,8 +31,9 @@ struct SingleResult {
 };
 
 struct ResultOutput {
-	std::vector<SingleResult> bbresults;
+	SingleResult *bbresults;
 	double responsetime;
+	int NumObject;
 };
 
 
