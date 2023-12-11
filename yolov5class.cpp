@@ -73,7 +73,7 @@ ResultOutput YOLO::post_process(Mat input_image, vector<Mat> &outputs)
     vector<float> confidences;
     vector<Rect> boxes; 
 	ResultOutput bbsoutputs;
-	SingleResult singlebb;
+	
     // Resizing factor.
     float x_factor = input_image.cols / INPUT_WIDTH;
     float y_factor = input_image.rows / INPUT_HEIGHT;
@@ -127,26 +127,27 @@ ResultOutput YOLO::post_process(Mat input_image, vector<Mat> &outputs)
     // Perform Non Maximum Suppression and draw predictions.
     vector<int> indices;
     NMSBoxes(boxes, confidences, SCORE_THRESHOLD, NMS_THRESHOLD, indices);
+	
+	bbsoutputs.bbresults = new SingleResult[indices.size()];
+	bbsoutputs.NumObject = indices.size();
     for (int i = 0; i < indices.size(); i++) 
     {
         int idx = indices[i];
         Rect box = boxes[idx];
-
-		singlebb.left = box.x;
-		singlebb.top = box.y;
-		singlebb.width = box.width;
-		singlebb.height = box.height;
+		bbsoutputs.bbresults[i].left = box.x;
+		bbsoutputs.bbresults[i].top = box.y;
+		bbsoutputs.bbresults[i].width = box.width;
+		bbsoutputs.bbresults[i].height = box.height;
         // Draw bounding box.
-        rectangle(input_image, Point(singlebb.left, singlebb.top), Point(singlebb.left + singlebb.width, singlebb.top + singlebb.height), BLUE, 3*THICKNESS);
+        rectangle(input_image, Point(bbsoutputs.bbresults[i].left, bbsoutputs.bbresults[i].top), Point(bbsoutputs.bbresults[i].left + bbsoutputs.bbresults[i].width, bbsoutputs.bbresults[i].top + bbsoutputs.bbresults[i].height), BLUE, 3*THICKNESS);
 
         // Get the label for the class name and its confidence.
         string label = format("%.2f", confidences[idx]);
         label = class_list[class_ids[idx]] + ":" + label;
         // Draw class labels.
-        draw_label(input_image, label, singlebb.left, singlebb.top);
-		singlebb.confidence = confidences[idx];
-		singlebb.classid = class_ids[idx];
-		bbsoutputs.bbresults.push_back(singlebb);
+        draw_label(input_image, label, bbsoutputs.bbresults[i].left, bbsoutputs.bbresults[i].top);
+		bbsoutputs.bbresults[i].confidence = confidences[idx];
+		bbsoutputs.bbresults[i].classid = class_ids[idx];
     }
 
     return bbsoutputs;
@@ -174,19 +175,19 @@ ResultOutput YOLO::detect(const string& imgpath, bool showimg=true)
     return imgOutput;
 }
 
-
+/*
 int main()
 {
 	// Load class list.
 	Mat frame;
-
-	YOLO yolomodel("./coco.names", "./models/yolov5s.onnx");
-	ResultOutput output=yolomodel.detect("sample.jpg");
-    
+	frame = imread("E:/medtronic/Project2/sample.jpg");
+	imshow("Output", frame);
+	YOLO yolomodel("E:/medtronic/coco.names", "E:/medtronic/Project2/models/yolov5s.onnx");
+	ResultOutput output=yolomodel.detect("E:/medtronic/Project2/sample.jpg");
 	return 0;
 }
 
-
+*/
 #ifdef __cplusplus
 extern "C" {
 #endif

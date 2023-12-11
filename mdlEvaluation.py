@@ -80,10 +80,10 @@ def modelperformance(args):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='object detection')
-    #parser.add_argument('--disable_cuda', default=False, action='store_true', help='Disable CUDA')
+    parser.add_argument('--disable_cuda', default=True, action='store_true', help='Disable CUDA')
     parser.add_argument('--labelpath', type=str, default='coco.names',help='labels')
     parser.add_argument('--imgpath', type=str, default='sample.jpg', help='imagepath for test')       
-    parser.add_argument('--modelpath', type=str, default='model/yolov5s.onnx')
+    parser.add_argument('--modelpath', type=str, default='model/yolov5m.onnx')
     parser.add_argument('--displayoutput', type=bool, default=False)
     parser.add_argument('--imgfolder', type=str, default='E:/medtronic/Project2/test/val2017',help='image foler path')
     parser.add_argument('--dir_annotations_gt', type=str,default='E:/medtronic/Project2/test/labels', help='directory of ground truth, yolo type')
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     
     #evaluate yolov5m model using coco dataset and write results to yolov5mresults.txt
     met = modelperformance(args)
-    with open('yolov5mresults.txt', 'w') as txtfile:
+    with open('yolovresults.txt', 'w') as txtfile:
         for key, value in met.items():
             txtfile.write(f"{key}: {value}\n")
 

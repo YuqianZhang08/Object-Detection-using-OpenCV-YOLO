@@ -28,6 +28,11 @@ class yolov5():
         self.classes=None 
         self.dtresults=[]
         self.displayoutput=args.displayoutput
+
+        if (args.disable_cuda==False):
+            self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+            self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
+
         #get classes from user input label path
         with open(args.labelpath, 'rt') as f:
              self.classes = f.read().rstrip('\n').split('\n')
@@ -45,7 +50,7 @@ class yolov5():
     def pre_process(self, input_image):
         # Create a 4D blob from a frame.
         blob = cv2.dnn.blobFromImage(input_image, 1/255, (self.INPUT_WIDTH, self.INPUT_HEIGHT), [0,0,0], 1, crop=False)
-
+        
         # Sets the input to the network.
         self.net.setInput(blob)
 
@@ -131,10 +136,10 @@ class yolov5():
 if __name__ == '__main__':
     # Get user input from the command line for the following parameters
     parser = argparse.ArgumentParser(description='object detection')
-    #parser.add_argument('--disable_cuda', default=False, action='store_true', help='Disable CUDA')
+    parser.add_argument('--disable_cuda', default=True, action='store_true', help='Disable CUDA')
     parser.add_argument('--labelpath', type=str, default='coco.names',help='labels')
     parser.add_argument('--imgpath', type=str, default='sample.jpg', help='imagepath for test')       
-    parser.add_argument('--modelpath', type=str, default='model/yolov5s.onnx')
+    parser.add_argument('--modelpath', type=str, default='model/yolov5m.onnx')
     parser.add_argument('--displayoutput', type=bool, default=True)
     args = parser.parse_args()
 

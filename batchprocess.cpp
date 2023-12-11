@@ -15,7 +15,9 @@ void writeResultsToFile(ResultOutput &output, const string &filename) {
 	}
 
 	// Write bounding box results to the file: classid confidence left top width height
-	for (const auto& result : output.bbresults) {
+	for (int i = 0; i < output.NumObject; i++)
+	{
+		SingleResult result = output.bbresults[i];
 		outFile << result.classid << " " << result.confidence <<" "<< result.left << " " << result.top
 			<< " " << result.width << " " << result.height
 			 << endl;
@@ -107,14 +109,15 @@ void processViaDll(const char* dllPath, const char* modelPath, const char* class
 
 
 }
-/*
+
+
 int main() {
 	
 	string folderPath = "E:/medtronic/Project2/test/val2017"; // Update this with your folder path
 
 	string classname = "E:/medtronic/coco.names"; 
 
-	string modelPath = "E:/medtronic/Project2/Project2/yolov5s.onnx";
+	string modelPath = "E:/medtronic/Project2/models/yolov5s.onnx";
 	string savepath = "E:/medtronic/Project2/test/cppdetect";
 
 	//YOLO yolomodel(classname, modelPath);
@@ -122,7 +125,7 @@ int main() {
 	batchProcess( modelPath, classname, folderPath, savepath);  //process the images in a folder
 	
 	return 0;
-}*/
+}
 
 #ifdef __cplusplus
 extern "C" {
