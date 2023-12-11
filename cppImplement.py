@@ -27,7 +27,6 @@ from src.evaluators.coco_evaluator import get_coco_summary
 from src.load_annotation import load_annotations_dt, load_annotations_gt
 from mdlEvaluation import modelperformance
 
-CONFIDENCE_THRESHOLD = 0.45
 #define single output structure type
 class SingleResult (ctypes.Structure):
 	_fields_= [("classid", ctypes.c_int),
@@ -39,7 +38,8 @@ class SingleResult (ctypes.Structure):
 
 class ResultOutput (ctypes.Structure):
 	_fields_= [('bbresults', ctypes.POINTER(SingleResult)),
-	("responsetime", ctypes.c_double)]
+	("responsetime", ctypes.c_double),
+    ("NumObj", ctypes.c_int)]
 	
 
 #define YOLO object and define input c types 
@@ -67,11 +67,10 @@ def writetofile(dll_results, savedir, filepath):
     # Open the file in write mode
     with open(file_path, 'w') as file:
         # Iterate through detection results and write them to the file
-        for result in dll_results:
+        for i in range(0,dll_results.NumObj):
+            result=dll_results.bbresults[i]
             # Format the result and write to the file: classid, confidence, left, top, width, height
-            if (result.classid<0 or result.confidence <=CONFIDENCE_THRESHOLD): break
-            else:
-                file.write(f"{result.classid} {result.confidence} {result.left} {result.top} {result.width} {result.height}\n")
+            file.write(f"{result.classid} {result.confidence} {result.left} {result.top} {result.width} {result.height}\n")
 
 
 def DLLbatchProcess(args):
@@ -98,7 +97,7 @@ def DLLbatchProcess(args):
         imgpath=args.imgfolder+'/'+filename
         imgpath=ctypes.c_char_p(imgpath.encode('utf-8'))
         result=yolo.YOLOSingledetect(imgpath,showIMG=False)     #perform detection to the current image 
-        writetofile(result.bbresults, savedir,imgid )
+        writetofile(result, savedir,imgid )
         #calculate inference time and save to the list
         inferenceTime.append(result.responsetime)
         
@@ -112,12 +111,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='object detection')
     #parser.add_argument('--disable_cuda', default=False, action='store_true', help='Disable CUDA')
     parser.add_argument('--labelpath', type=str, default='./coco.names',help='labels')
-    parser.add_argument('--dllpath', type=str, default='E:/medtronic/git/open/lib/YOLO.dll', help='imagepath for test')       
+    parser.add_argument('--dllpath', type=str, default='E:/medtronic/OpencvTask-main/OpencvTask-main/lib/YOLO.dll', help='imagepath for test')       
     parser.add_argument('--modelpath', type=str, default='./model/yolov5s.onnx')
     parser.add_argument('--displayoutput', type=bool, default=False)
-    parser.add_argument('--imgfolder', type=str, default='E:/medtronic/Project2/test/val2017',help='image foler path')
-    parser.add_argument('--dir_annotations_gt', type=str,default='E:/medtronic/Project2/test/labels', help='directory of ground truth, yolo type')
-    parser.add_argument('--dir_dets', type=str, default='./detect')
+    parser.add_argument('--imgfolder', type=str, default='./test/val2017',help='image foler path')
+    parser.add_argument('--dir_annotations_gt', type=str,default='./test/labels', help='directory of ground truth, yolo type')
+    parser.add_argument('--dir_dets', type=str, default='./test/cpp')
     parser.add_argument('--pyorcpp', type=str, default='cpp')
     args = parser.parse_args()
     
@@ -146,7 +145,7 @@ if __name__ == '__main__':
         cppdet_annotations = load_annotations_dt(args.dir_dets,args.imgfolder,args.labelpath)
         cpp_res = {}
         cpp_res = get_coco_summary(gt_annotations, cppdet_annotations)
-        with open('E:/medtronic/git/open/cpp5s_res.txt', 'w') as txtfile:
+        with open('./cpp5s_res.txt', 'w') as txtfile:
             for key, value in cpp_res.items():
                 txtfile.write(f"{key}: {value}\n")
             txtfile.write(f"InferenceTime:{avetime} ms\n")
@@ -154,6 +153,6 @@ if __name__ == '__main__':
     if (args.pyorcpp=="py"):
         #obtain python implementation evaluation results and write to file        
         python_met = modelperformance(args)
-        with open('E:/medtronic/git/open/py5s_res.txt', 'w') as txtfile:
+        with open('./py5s_res.txt', 'w') as txtfile:
             for key, value in python_met.items():
                 txtfile.write(f"{key}: {value}\n")
