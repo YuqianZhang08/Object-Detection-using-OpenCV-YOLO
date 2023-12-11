@@ -75,6 +75,7 @@ Add all of the four cpp project files to source file in CMakeLists.
 
 ```C++ Windows
 cmake -S . -B build
+cmake -DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
 .\build\Release\main.exe   //for .exe 
 ```
