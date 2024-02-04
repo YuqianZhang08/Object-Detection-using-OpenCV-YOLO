@@ -1,4 +1,4 @@
-# Improvement and implementation of C++ and Python code for YOLO object detection with NMS. 
+# C++ and Python code for YOLO object detection  
 
 The project is based on the [Object Detection using YOLOv5 (C++/Python)](https://github.com/spmallick/learnopencv/tree/master/Object-Detection-using-YOLOv5-and-OpenCV-DNN-in-CPP-and-Python). 
 
